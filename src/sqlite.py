@@ -10,6 +10,10 @@ class SQLiteTable:
   def get_info(self):
     return self.db.get_info(self.name)
 
+  def count(self):
+    count_comm = """SELECT COUNT(1) AS count FROM {0};""".format(self.name)
+    return self.db.execute(count_comm, get=True)[0]['count']
+
   # sql.get('table_name').insert([("r1c1", "r1c2"), ("r2c1", "r2c2")])
   def insert(self, rows):
     if not type(rows) == list:
@@ -30,7 +34,14 @@ class SQLiteTable:
   def where(self, conditions):
     get_command = """SELECT * FROM {0} WHERE {1};""".format(
       self.name,
-      " AND ".join(["{0} = {1}".format(k,v) for k, v in conditions.iteritems()])
+      " AND ".join(["{0} = {1}".format(k,repr(v)) for k, v in conditions.iteritems()])
+    )
+    return self.db.execute(get_command, get=True)
+
+  def del_where(self, conditions):
+    get_command = """DELETE FROM {0} WHERE {1};""".format(
+      self.name,
+      " AND ".join(["{0} = {1}".format(k,repr(v)) for k, v in conditions.iteritems()])
     )
     return self.db.execute(get_command, get=True)
 

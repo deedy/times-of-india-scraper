@@ -151,13 +151,36 @@ class ToiScraper():
         return URL_CORRECT + url
     return url
 
+  def dedup_insert(self, data, ds):
+    date_str = '-'.join(map(str, ds))
+    print("Asking to insert {0} articles in {1}".format(len(data), date_str))
+    rows = self.table.where({'ds': date_str})
+    print("Already {0} rows exist in {1}".format(len(rows), date_str))
+    titles = set({})
+    res = []
+    for a in rows:
+      if not a['title'] in titles:
+        titles.add(a['title'])
+        res.append((a['ds'], a['title'], a['url']))
+    for r in data:
+      if not r[1] in titles:
+        titles.add(r[1])
+        res.append(r)
+    print("{0} rows left after deduplicating".format(len(res)))
+    if len(rows) > 0:
+      print("Deleting {0} rows from {1}".format(len(rows), date_str))
+      self.table.del_where({'ds': date_str})
+    if len(res) > 0:
+      print("Inserting {0} rows from {1}".format(len(res), date_str))
+      self.table.insert(res)
+
   def get_articles_for_day(self, year, month, day):
     print("Getting articles for the day")
     url = self.compute_url_for_day(year, month, day)
     if not url:
       return 0
     data = self._retrieve_url_contents(url, (year, month, day))
-    self.table.insert(data)
+    self.dedup_insert(data, (year, month, day))
     return len(data)
 
   def run(self):
@@ -176,7 +199,7 @@ class ToiScraper():
         print('New date set to {0}'.format(self.iter_date))
       print("Retrieving articles for date {0}".format(self.iter_date))
       num_rows = self.get_articles_for_day(*self.iter_date)
-      print("Retrieved {0} rows".format(num_rows))
+      print("Retrieved {0} rows from TOI".format(num_rows))
       if num_rows == 0:
         print("Sleeping for 10 seconds, no rows retrieved")
         time.sleep(10)
