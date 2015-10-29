@@ -1,5 +1,4 @@
 import logging
-from daemon import runner
 import time
 from datetime import date, datetime, timedelta
 import requests
@@ -9,7 +8,7 @@ from IPython.core.debugger import Tracer
 
 LOG_FILE = '/Users/deedy/Dev/Python/times-of-india-scraper/toidaemon.log'
 PID_FILE_PATH = '/Users/deedy/Dev/Python/times-of-india-scraper/toi.pid'
-DB_PATH = '/Users/deedy/Dropbox/toi_2000_2015/toi'
+DB_PATH = '/Users/deedy/Dropbox/toi_2000_2015/toi.db'
 
 class ToiScraper():
   TABLE_NAME = 'articles'

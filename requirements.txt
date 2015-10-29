@@ -1,0 +1,4 @@
+ipython == 4.0.0
+python-daemon==2.0.6
+beautifulsoup4==4.3.2
+requests==2.4.3
